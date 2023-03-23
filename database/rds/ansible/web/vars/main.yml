@@ -1,0 +1,4 @@
+db_instance_endpoint: ######
+db_username: tutorial_user
+db_master_password: ######
+db_name: sample

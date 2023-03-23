@@ -1,0 +1,83 @@
+- include_vars: vars/main.yml
+- name: Run yum upgrade
+  yum:
+    name: "*"
+    state: latest
+
+- name: Install apache web server and PHP
+  yum:
+    name:
+      - httpd24
+      - php56
+      - php56-mysqlnd
+  
+- name: Start httpd service
+  service:
+    name: httpd
+    state: started
+
+- name: Alter httpd service, to start on boot
+  shell: chkconfig httpd on
+
+- name: Add www group
+  group:
+    name: www
+    state: present
+
+- name: Add ec2-user to www group
+  user:
+    name: ec2-user
+    shell: /bin/bash
+    group: www
+
+- name: Change ownership of /var/www
+  file:
+    path: /var/www
+    group: www
+    recurse: yes
+
+- name: Add write permissions to /var/www
+  file:
+    path: /var/www
+    state: directory
+    mode: '2775'
+    recurse: no
+
+- name: Add group write permissions and set the group ID on subdirectories in /var/www
+  shell: find /var/www -type d -exec sudo chmod 2775 {} +
+
+- name: Add group write permissions for files in the /var/www directory and its subdirectories
+  shell: find /var/www -type f -exec sudo chmod 0664 {} +
+  
+- name: Create directory /var/www/inc
+  become: true
+  become_user: ec2-user
+  file:
+    path: /var/www/inc
+    state: directory
+
+- name: Create directory /var/www/html
+  become: true
+  become_user: ec2-user
+  file:
+    path: /var/www/html
+    state: directory
+
+  
+- name: Copy templates/SamplePage.php to /var/www/html
+  become: true
+  become_user: ec2-user
+  template:
+    src: templates/SamplePage.php
+    dest: /var/www/html
+
+- name: Copy templates/SamplePage.php to /var/www/html
+  template:
+    src: templates/SamplePage.php
+    dest: /var/www/html
+
+
+- name: Copy templates/dbinfo.inc.j2 to /var/www/html
+  template:
+    src: templates/dbinfo.inc.j2
+    dest: /var/www/inc/dbinfo.inc
