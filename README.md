@@ -1,2 +1,2 @@
 # dev-aws-cdk
-Development scripts for building infrastructure on AWS
+Python scripts for building infrastructure on AWS using the Cloud Development Kit
